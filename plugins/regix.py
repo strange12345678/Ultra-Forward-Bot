@@ -70,7 +70,7 @@ async def pub_(bot, message):
     await db.add_frwd(user)
     await send(client, user, "🩷 Ignore This Message")
     sts.add(time=True)
-    sleep = 1 if _bot['is_bot'] else 100
+    sleep = 1 if _bot['is_bot'] else 0
     await msg_edit(m, "Processing...") 
     temp.IS_FRWD_CHAT.append(i.TO)
     temp.lock[user] = locked = True
@@ -78,7 +78,7 @@ async def pub_(bot, message):
         try:
           MSG = []
           pling=0
-          await edit(m, 'Progressing', 100, sts)
+          await edit(m, 'Progressing', 0, sts)
           print(f"Starting Forwarding Process... From :{sts.get('FROM')} To: {sts.get('TO')} Totel: {sts.get('limit')} Stats : {sts.get('skip')})")
           async for message in client.iter_messages(
             client,
@@ -105,8 +105,8 @@ async def pub_(bot, message):
                    MSG.append(message.id)
                    notcompleted = len(MSG)
                    completed = sts.get('total') - sts.get('fetched')
-                   if ( notcompleted >= 100 
-                        or completed <= 100): 
+                   if ( notcompleted >= 10 
+                        or completed <= 10): 
                       await forward(client, MSG, m, sts, protect)
                       sts.add('total_files', notcompleted)
                       await asyncio.sleep(100)
@@ -146,7 +146,7 @@ async def copy(bot, msg, m, sts):
    except FloodWait as e:
      await edit(m, 'Progressing', e.value, sts)
      await asyncio.sleep(e.value)
-     await edit(m, 'Progressing', 100, sts)
+     await edit(m, 'Progressing', 0, sts)
      await copy(bot, msg, m, sts)
    except Exception as e:
      print(e)
@@ -162,7 +162,7 @@ async def forward(bot, msg, m, sts, protect):
    except FloodWait as e:
      await edit(m, 'Progressing', e.value, sts)
      await asyncio.sleep(e.value)
-     await edit(m, 'Progressing', 100, sts)
+     await edit(m, 'Progressing', 0, sts)
      await forward(bot, msg, m, sts, protect)
 
 PROGRESS = """
@@ -191,8 +191,8 @@ async def msg_edit(msg, text, button=None, wait=None):
         
 async def edit(msg, title, status, sts):
    i = sts.get(full=True)
-   status = 'Forwarding' if status == 100 else f"Sleeping {status} s" if str(status).isnumeric() else status
-   percentage = "{:.0f}".format(float(i.fetched)*100/float(i.total))
+   status = 'Forwarding' if status == 0 else f"Sleeping {status} s" if str(status).isnumeric() else status
+   percentage = "{:.0f}".format(float(i.fetched)*10/float(i.total))
    
    now = time.time()
    diff = int(now - i.start)
@@ -201,8 +201,8 @@ async def edit(msg, title, status, sts):
    time_to_completion = round(sts.divide(i.total - i.fetched, int(speed))) * 1000
    estimated_total_time = elapsed_time + time_to_completion  
    progress = "▰{0}{1}".format(
-       ''.join(["▰" for i in range(math.floor(int(percentage) / 100))]),
-       ''.join(["▱" for i in range(100 - math.floor(int(percentage) / 100))]))
+       ''.join(["▰" for i in range(math.floor(int(percentage) / 10))]),
+       ''.join(["▱" for i in range(10 - math.floor(int(percentage) / 10))]))
    button =  [[InlineKeyboardButton(title, f'fwrdstatus#{status}#{estimated_total_time}#{percentage}#{i.id}')]]
    estimated_total_time = TimeFormatter(milliseconds=estimated_total_time)
    estimated_total_time = estimated_total_time if estimated_total_time != '' else '0 s'
